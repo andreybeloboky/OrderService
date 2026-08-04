@@ -21,18 +21,8 @@
         <constraints nullable="false"/>
       </column>
     </createTable>
-    <addForeignKeyConstraint baseTableName="order_items"
-                             baseColumnNames="order_id"
-                             constraintName="fk_order"
-                             referencedTableName="orders"
-                             referencedColumnNames="id"
-                             deleteCascade="true"/>
-    <addForeignKeyConstraint baseTableName="order_items"
-                             baseColumnNames="item_id"
-                             constraintName="fk_item"
-                             referencedTableName="items"
-                             referencedColumnNames="id"
-                             deleteCascade="true"/>
+    <addForeignKeyConstraint baseTableName="order_items" baseColumnNames="order_id" constraintName="fk_order" referencedTableName="orders" referencedColumnNames="id" deleteCascade="true"/>
+    <addForeignKeyConstraint baseTableName="order_items" baseColumnNames="item_id" constraintName="fk_item" referencedTableName="items" referencedColumnNames="id" deleteCascade="true"/>
     <createIndex tableName="order_items" indexName="idx_order_items_order_id" unique="false">
       <column name="order_id"/>
     </createIndex>

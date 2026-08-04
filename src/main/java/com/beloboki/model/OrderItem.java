@@ -6,10 +6,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import lombok.experimental.SuperBuilder;
-import org.springframework.data.annotation.CreatedDate;
-import org.springframework.data.annotation.LastModifiedDate;
-
-import java.time.LocalDateTime;
+import org.hibernate.annotations.SQLRestriction;
 
 @Entity
 @Table(name = "order_items")
@@ -18,6 +15,7 @@ import java.time.LocalDateTime;
 @NoArgsConstructor
 @AllArgsConstructor
 @SuperBuilder
+@SQLRestriction("deleted = false")
 public class OrderItem extends Audit {
 
     @Id

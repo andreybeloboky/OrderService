@@ -1,15 +1,15 @@
 package com.beloboki.model;
 
 import jakarta.persistence.*;
+import java.math.BigDecimal;
+import java.util.ArrayList;
+import java.util.List;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import lombok.experimental.SuperBuilder;
-
-import java.math.BigDecimal;
-import java.util.ArrayList;
-import java.util.List;
+import org.hibernate.annotations.SQLRestriction;
 
 @Entity
 @Table(name = "orders")
@@ -18,6 +18,7 @@ import java.util.List;
 @NoArgsConstructor
 @AllArgsConstructor
 @SuperBuilder
+@SQLRestriction("deleted = false")
 public class Order extends Audit {
 
     @Id
@@ -28,7 +29,8 @@ public class Order extends Audit {
     private Long userId;
 
     @Column(nullable = false)
-    private String status;
+    @Enumerated(EnumType.STRING)
+    private Status status;
 
     @Column(name = "total_price", nullable = false)
     private BigDecimal totalPrice;
