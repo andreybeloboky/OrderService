@@ -1,4 +1,4 @@
-package com.beloboki.order_service;
+package com.beloboki;
 
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
