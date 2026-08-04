@@ -11,10 +11,10 @@
       <column name="status" type="VARCHAR(255)">
         <constraints nullable="false"/>
       </column>
-      <column name="total_price" type="BIGINT">
+      <column name="total_price" type="DECIMAL(19,4)">
         <constraints nullable="false"/>
       </column>
-      <column name="delete" type="BOOLEAN">
+      <column name="deleted" type="BOOLEAN" defaultValueBoolean="false">
         <constraints nullable="false"/>
       </column>
       <column name="created_at" type="TIMESTAMP">
@@ -24,5 +24,14 @@
         <constraints nullable="false"/>
       </column>
     </createTable>
+    <createIndex tableName="orders" indexName="idx_orders_user_id" unique="false">
+      <column name="user_id"/>
+    </createIndex>
+    <createIndex tableName="orders" indexName="idx_orders_status" unique="false">
+      <column name="status"/>
+    </createIndex>
+    <createIndex tableName="orders" indexName="idx_orders_created_at" unique="false">
+      <column name="created_at"/>
+    </createIndex>
   </changeSet>
 </databaseChangeLog>

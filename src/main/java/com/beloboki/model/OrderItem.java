@@ -1,6 +1,7 @@
 package com.beloboki.model;
 
 import jakarta.persistence.*;
+import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
@@ -12,31 +13,25 @@ import java.time.LocalDateTime;
 
 @Entity
 @Table(name = "order_items")
-@Setter
 @Getter
-@SuperBuilder
+@Setter
 @NoArgsConstructor
-public class OrderItem {
+@AllArgsConstructor
+@SuperBuilder
+public class OrderItem extends Audit {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "id", nullable = false)
-    private long id;
+    private Long id;
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "order_id", nullable = false)
+    private Order order;
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "item_id", nullable = false)
+    private Item item;
 
     @Column(nullable = false)
-    private long order_id;
-
-    @Column(nullable = false)
-    private long item_id;
-
-    @Column(nullable = false)
-    private long quantity;
-
-    @Column(name = "created_at", updatable = false)
-    @CreatedDate
-    private LocalDateTime createdAt;
-
-    @Column(name = "updated_at")
-    @LastModifiedDate
-    private LocalDateTime updatedAt;
+    private Integer quantity;
 }

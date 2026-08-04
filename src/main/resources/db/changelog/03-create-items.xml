@@ -11,7 +11,7 @@
       <column name="name" type="VARCHAR(255)">
         <constraints nullable="false"/>
       </column>
-      <column name="price" type="BIGINT">
+      <column name="price" type="DECIMAL(19,4)">
         <constraints nullable="false"/>
       </column>
       <column name="created_at" type="TIMESTAMP">
@@ -21,5 +21,8 @@
         <constraints nullable="false"/>
       </column>
     </createTable>
+    <createIndex tableName="items" indexName="idx_items_name" unique="false">
+      <column name="name"/>
+    </createIndex>
   </changeSet>
 </databaseChangeLog>

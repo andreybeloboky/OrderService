@@ -1,46 +1,47 @@
 package com.beloboki.model;
 
 import jakarta.persistence.*;
+import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import lombok.experimental.SuperBuilder;
-import org.springframework.data.annotation.CreatedDate;
-import org.springframework.data.annotation.LastModifiedDate;
 
-import java.time.LocalDateTime;
+import java.math.BigDecimal;
+import java.util.ArrayList;
+import java.util.List;
 
 @Entity
 @Table(name = "orders")
-@Setter
 @Getter
-@SuperBuilder
+@Setter
 @NoArgsConstructor
-public class Order {
+@AllArgsConstructor
+@SuperBuilder
+public class Order extends Audit {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "id", nullable = false)
-    private long id;
+    private Long id;
+
+    @Column(name = "user_id", nullable = false)
+    private Long userId;
 
     @Column(nullable = false)
-    private long user_id;
-
-    @Column(nullable = false)
-    private Status status;
+    private String status;
 
     @Column(name = "total_price", nullable = false)
-    private boolean totalPrice;
+    private BigDecimal totalPrice;
 
     @Column(nullable = false)
-    private boolean delete;
+    private Boolean deleted = false;
 
-    @Column(name = "created_at", updatable = false)
-    @CreatedDate
-    private LocalDateTime createdAt;
+    @Transient private String userEmail;
 
-    @Column(name = "updated_at")
-    @LastModifiedDate
-    private LocalDateTime updatedAt;
-
+    @OneToMany(
+            mappedBy = "order",
+            cascade = CascadeType.ALL,
+            orphanRemoval = true,
+            fetch = FetchType.LAZY)
+    private List<OrderItem> orderItems = new ArrayList<>();
 }
