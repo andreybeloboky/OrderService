@@ -14,6 +14,10 @@ import com.beloboki.exception.UserNotFoundException;
 import com.beloboki.mapper.OrderMapper;
 import com.beloboki.model.*;
 import com.beloboki.specification.OrderSpecifications;
+import java.math.BigDecimal;
+import java.time.LocalDateTime;
+import java.util.List;
+import java.util.Objects;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.cache.annotation.CacheConfig;
@@ -24,11 +28,6 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.security.authorization.AuthorizationDeniedException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-
-import java.math.BigDecimal;
-import java.time.LocalDateTime;
-import java.util.List;
-import java.util.Objects;
 
 @Service
 @RequiredArgsConstructor
@@ -58,15 +57,20 @@ public class OrderService {
         BigDecimal total = BigDecimal.ZERO;
 
         for (OrderItem orderItem : order.getOrderItems()) {
-            Item item = itemDAO.findById(orderItem.getItem().getId())
-                    .orElseThrow(
-                            () -> new ItemNotFoundException("Item not found with id "
-                                    + orderItem.getItem().getId()));
+            Item item =
+                    itemDAO.findById(orderItem.getItem().getId())
+                            .orElseThrow(
+                                    () ->
+                                            new ItemNotFoundException(
+                                                    "Item not found with id "
+                                                            + orderItem.getItem().getId()));
 
             orderItem.setOrder(order);
             orderItem.setItem(item);
 
-            total = total.add(item.getPrice().multiply(BigDecimal.valueOf(orderItem.getQuantity())));
+            total =
+                    total.add(
+                            item.getPrice().multiply(BigDecimal.valueOf(orderItem.getQuantity())));
         }
 
         order.setTotalPrice(total);

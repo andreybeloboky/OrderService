@@ -17,22 +17,22 @@ public class UserClient {
 
     @CircuitBreaker(name = "userService", fallbackMethod = "fallback")
     public UserResponse getUserByEmail(String email) {
-            return userWebClient
-                    .get()
-                    .uri(uriBuilder -> uriBuilder.path("/api/users/email/{email}").build(email))
-                    .retrieve()
-                    .bodyToMono(UserResponse.class)
-                    .block();
+        return userWebClient
+                .get()
+                .uri(uriBuilder -> uriBuilder.path("/api/users/email/{email}").build(email))
+                .retrieve()
+                .bodyToMono(UserResponse.class)
+                .block();
     }
 
     @CircuitBreaker(name = "userService", fallbackMethod = "fallback")
     public UserResponse getUserById(Long id) {
-            return userWebClient
-                    .get()
-                    .uri(uriBuilder -> uriBuilder.path("/api/users/{id}").build(id))
-                    .retrieve()
-                    .bodyToMono(UserResponse.class)
-                    .block();
+        return userWebClient
+                .get()
+                .uri(uriBuilder -> uriBuilder.path("/api/users/{id}").build(id))
+                .retrieve()
+                .bodyToMono(UserResponse.class)
+                .block();
     }
 
     public UserResponse fallback(Exception e) {

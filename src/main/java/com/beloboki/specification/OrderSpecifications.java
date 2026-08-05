@@ -1,18 +1,15 @@
 package com.beloboki.specification;
 
 import com.beloboki.model.Order;
+import com.beloboki.model.Status;
 import java.time.LocalDateTime;
 import java.util.List;
-
-import com.beloboki.model.Status;
 import org.springframework.data.jpa.domain.Specification;
 
 public class OrderSpecifications {
 
     public static Specification<Order> getOrdersByCriteria(
-            LocalDateTime startDate,
-            LocalDateTime endDate,
-            List<Status> statuses) {
+            LocalDateTime startDate, LocalDateTime endDate, List<Status> statuses) {
 
         return Specification.where(createdAfter(startDate))
                 .and(createdBefore(endDate))
