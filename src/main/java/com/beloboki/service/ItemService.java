@@ -8,6 +8,7 @@ import com.beloboki.exception.ItemNotFoundException;
 import com.beloboki.mapper.ItemMapper;
 import com.beloboki.model.Item;
 import com.beloboki.model.Role;
+import java.util.Objects;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.cache.annotation.CacheConfig;
@@ -18,8 +19,6 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.security.authorization.AuthorizationDeniedException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-
-import java.util.Objects;
 
 @Service
 @RequiredArgsConstructor

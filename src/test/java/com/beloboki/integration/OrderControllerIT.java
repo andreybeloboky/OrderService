@@ -1,5 +1,8 @@
 package com.beloboki.integration;
 
+import static com.github.tomakehurst.wiremock.client.WireMock.*;
+import static org.junit.jupiter.api.Assertions.*;
+
 import com.beloboki.dao.ItemDAO;
 import com.beloboki.dao.OrderDAO;
 import com.beloboki.dto.OrderItemRequest;
@@ -9,6 +12,8 @@ import com.beloboki.model.Item;
 import com.beloboki.model.Order;
 import com.beloboki.model.OrderItem;
 import com.beloboki.model.Status;
+import java.math.BigDecimal;
+import java.util.List;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -16,12 +21,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ProblemDetail;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.test.web.reactive.server.WebTestClient;
-
-import java.math.BigDecimal;
-import java.util.List;
-
-import static com.github.tomakehurst.wiremock.client.WireMock.*;
-import static org.junit.jupiter.api.Assertions.*;
 
 public class OrderControllerIT extends AbstractIT {
 
