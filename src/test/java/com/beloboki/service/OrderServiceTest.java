@@ -4,6 +4,7 @@ import com.beloboki.client.UserClient;
 import com.beloboki.config.CurrentUser;
 import com.beloboki.dao.ItemDAO;
 import com.beloboki.dao.OrderDAO;
+import com.beloboki.dao.OrderItemDAO;
 import com.beloboki.dto.OrderItemRequest;
 import com.beloboki.dto.OrderRequest;
 import com.beloboki.dto.OrderResponse;
@@ -41,12 +42,14 @@ public class OrderServiceTest {
 
     @Mock private OrderMapper orderMapper;
 
-    @Mock private UserClient userServiceClient;
+    @Mock private OrderItemDAO orderItemDAO;
+
+    @Mock private UserClient userClient;
 
     @InjectMocks private OrderService orderService;
 
     @Test
-    void testCreateOrder() {
+    void givenOrderRequest_ShouldCreateOrder_WhenUserExists() {
         OrderRequest request =
                 new OrderRequest(
                         "test@test.com", Status.CREATED, List.of(new OrderItemRequest(1L, 2)));
@@ -80,7 +83,7 @@ public class OrderServiceTest {
                         LocalDateTime.now(),
                         List.of());
 
-        when(userServiceClient.getUserByEmail(request.userEmail())).thenReturn(user);
+        when(userClient.getUserByEmail(request.userEmail())).thenReturn(user);
         when(orderMapper.toEntity(request)).thenReturn(mappedOrder);
         when(itemDAO.findById(1L)).thenReturn(Optional.of(item));
         when(orderDAO.save(any(Order.class))).thenReturn(order);
@@ -98,14 +101,14 @@ public class OrderServiceTest {
     }
 
     @Test
-    void testCreateOrderUserNotFound() {
+    void givenOrderRequest_ShouldThrowException_WhenUserNotFound() {
         OrderRequest request =
                 new OrderRequest(
                         "test@test.com", Status.CREATED, List.of(new OrderItemRequest(1L, 2)));
         Order mappedOrder = new Order();
         mappedOrder.setUserEmail("test@test.com");
         when(orderMapper.toEntity(request)).thenReturn(mappedOrder);
-        when(userServiceClient.getUserByEmail("test@test.com")).thenReturn(null);
+        when(userClient.getUserByEmail("test@test.com")).thenReturn(null);
 
         assertThrows(
                 UserNotFoundException.class,
@@ -113,7 +116,7 @@ public class OrderServiceTest {
     }
 
     @Test
-    void testGetOrderById() {
+    void givenOrderId_ShouldReturnOrder_WhenOrderExists() {
         Order order = new Order();
         order.setId(10L);
         order.setUserId(1L);
@@ -132,7 +135,7 @@ public class OrderServiceTest {
                         List.of());
 
         when(orderDAO.findById(10L)).thenReturn(Optional.of(order));
-        when(userServiceClient.getUserById(1L)).thenReturn(user);
+        when(userClient.getUserById(1L)).thenReturn(user);
         when(orderMapper.toResponse(any(Order.class), any(UserResponse.class)))
                 .thenReturn(mappedResponse);
 
@@ -143,7 +146,7 @@ public class OrderServiceTest {
     }
 
     @Test
-    void testGetOrders() {
+    void givenFilterParameters_ShouldReturnOrders_WhenOrdersExist() {
         Order order = new Order();
         order.setId(10L);
         order.setUserId(1L);
@@ -163,7 +166,7 @@ public class OrderServiceTest {
                         List.of());
 
         when(orderDAO.findAll(any(Specification.class), any(PageRequest.class))).thenReturn(page);
-        when(userServiceClient.getUserById(1L)).thenReturn(user);
+        when(userClient.getUserById(1L)).thenReturn(user);
         when(orderMapper.toResponse(any(Order.class), any(UserResponse.class)))
                 .thenReturn(mappedResponse);
 
@@ -175,7 +178,7 @@ public class OrderServiceTest {
     }
 
     @Test
-    void testGetOrdersByUserId() {
+    void givenUserId_ShouldReturnOrders_WhenUserHasOrders() {
         Order order = new Order();
         order.setId(10L);
         order.setUserId(1L);
@@ -194,7 +197,7 @@ public class OrderServiceTest {
                         List.of());
 
         when(orderDAO.findByUserId(1L)).thenReturn(List.of(order));
-        when(userServiceClient.getUserById(1L)).thenReturn(user);
+        when(userClient.getUserById(1L)).thenReturn(user);
         when(orderMapper.toResponse(any(Order.class), any(UserResponse.class)))
                 .thenReturn(mappedResponse);
 
@@ -206,7 +209,7 @@ public class OrderServiceTest {
     }
 
     @Test
-    void testUpdateOrder() {
+    void givenOrderIdAndUpdateRequest_ShouldUpdateOrder_WhenOrderExists() {
         OrderRequest request =
                 new OrderRequest(
                         "test@test.com", Status.PAID, List.of(new OrderItemRequest(1L, 2)));
@@ -240,7 +243,7 @@ public class OrderServiceTest {
                         List.of());
 
         when(orderDAO.findById(10L)).thenReturn(Optional.of(order));
-        when(userServiceClient.getUserByEmail(request.userEmail())).thenReturn(user);
+        when(userClient.getUserByEmail(request.userEmail())).thenReturn(user);
         when(orderMapper.toEntity(request)).thenReturn(mappedOrder);
         when(itemDAO.findById(1L)).thenReturn(Optional.of(item));
         when(orderDAO.save(any(Order.class))).thenReturn(order);
@@ -254,7 +257,7 @@ public class OrderServiceTest {
     }
 
     @Test
-    void testDeleteOrder() {
+    void givenOrderId_ShouldDeleteOrder_WhenOrderExists() {
         Order order = new Order();
         order.setId(10L);
         when(orderDAO.findById(10L)).thenReturn(Optional.of(order));

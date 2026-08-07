@@ -45,7 +45,7 @@
     <jacoco.argLine></jacoco.argLine>
     <surefire-plugin>3.1.2</surefire-plugin>
     <failsafe-plugin>3.2.1</failsafe-plugin>
-    <sonar.projectKey>andreybeloboky_UserService</sonar.projectKey>
+    <sonar.projectKey>andreybeloboky_OrderService</sonar.projectKey>
     <sonar.organization>andreibeloboki</sonar.organization>
     <sonar.host.url>https://sonarcloud.io</sonar.host.url>
   </properties>

@@ -4,10 +4,8 @@ import jakarta.persistence.*;
 import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.List;
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
+
+import lombok.*;
 import lombok.experimental.SuperBuilder;
 import org.hibernate.annotations.SQLRestriction;
 
@@ -36,6 +34,7 @@ public class Order extends Audit {
     private BigDecimal totalPrice;
 
     @Column(nullable = false)
+    @Builder.Default
     private Boolean deleted = false;
 
     @Transient private String userEmail;

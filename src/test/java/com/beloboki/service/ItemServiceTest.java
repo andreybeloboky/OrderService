@@ -35,7 +35,7 @@ public class ItemServiceTest {
     @InjectMocks private ItemService itemService;
 
     @Test
-    void testCreateItem() {
+    void givenItemRequest_ShouldCreateItem_WhenValidRequest() {
         ItemRequest request = new ItemRequest("Test", BigDecimal.TEN);
         Item item = new Item(null, "Test", BigDecimal.TEN);
         Item savedItem = new Item(1L, "Test", BigDecimal.TEN);
@@ -50,7 +50,7 @@ public class ItemServiceTest {
     }
 
     @Test
-    void testGetItemById() {
+    void givenItemId_ShouldReturnItem_WhenItemExists() {
         Item item = new Item(1L, "Test", BigDecimal.TEN);
         ItemResponse response = new ItemResponse(1L, "Test", BigDecimal.TEN);
         when(itemDAO.findById(1L)).thenReturn(Optional.of(item));
@@ -61,14 +61,14 @@ public class ItemServiceTest {
     }
 
     @Test
-    void testGetItemByIdAccessDenied() {
+    void givenItemIdAndDifferentUser_ShouldThrowException_WhenAccessDenied() {
         assertThrows(
                 AuthorizationDeniedException.class,
                 () -> itemService.getItemById(1L, new CurrentUser(2L, "user", "USER")));
     }
 
     @Test
-    void testGetItems() {
+    void givenPageRequest_ShouldReturnItems_WhenItemsExist() {
         Item item = new Item(1L, "Test", BigDecimal.TEN);
         ItemResponse response = new ItemResponse(1L, "Test", BigDecimal.TEN);
         Page<Item> page = new PageImpl<>(List.of(item));
@@ -81,7 +81,7 @@ public class ItemServiceTest {
     }
 
     @Test
-    void testUpdateItem() {
+    void givenItemIdAndUpdateRequest_ShouldUpdateItem_WhenItemExists() {
         ItemRequest request = new ItemRequest("Test2", BigDecimal.valueOf(20));
         Item item = new Item(1L, "Test", BigDecimal.TEN);
         Item mappedItem = new Item(null, "Test2", BigDecimal.valueOf(20));
@@ -98,7 +98,7 @@ public class ItemServiceTest {
     }
 
     @Test
-    void testDeleteItem() {
+    void givenItemId_ShouldDeleteItem_WhenItemExists() {
         Item item = new Item(1L, "Test", BigDecimal.TEN);
         when(itemDAO.findById(1L)).thenReturn(Optional.of(item));
 

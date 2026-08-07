@@ -1,10 +1,7 @@
 package com.beloboki.model;
 
 import jakarta.persistence.*;
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
+import lombok.*;
 import lombok.experimental.SuperBuilder;
 import org.hibernate.annotations.SQLRestriction;
 
@@ -32,4 +29,8 @@ public class OrderItem extends Audit {
 
     @Column(nullable = false)
     private Integer quantity;
+
+    @Column(nullable = false)
+    @Builder.Default
+    private Boolean deleted = false;
 }
