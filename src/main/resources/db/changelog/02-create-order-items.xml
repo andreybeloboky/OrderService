@@ -27,4 +27,13 @@
       <column name="order_id"/>
     </createIndex>
   </changeSet>
+
+  <changeSet id="08-08-26-add-deleted-column-order-items" author="Andrei">
+    <addColumn tableName="order_items">
+      <column name="deleted" type="BOOLEAN" defaultValueBoolean="false">
+        <constraints nullable="false"/>
+      </column>
+    </addColumn>
+  </changeSet>
+
 </databaseChangeLog>
