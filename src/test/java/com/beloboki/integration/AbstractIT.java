@@ -1,11 +1,12 @@
 package com.beloboki.integration;
 
+import static com.github.tomakehurst.wiremock.core.WireMockConfiguration.options;
+
 import com.github.tomakehurst.wiremock.WireMockServer;
 import com.redis.testcontainers.RedisContainer;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
 import io.jsonwebtoken.security.Keys;
-import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.BeforeAll;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -26,7 +27,8 @@ public abstract class AbstractIT {
 
     private static final RedisContainer REDIS = new RedisContainer("redis:7-alpine");
 
-    protected static WireMockServer wireMockServer;
+    protected static final WireMockServer wireMockServer =
+            new WireMockServer(options().dynamicPort());
 
     @Autowired protected CacheManager cacheManager;
 
@@ -45,21 +47,12 @@ public abstract class AbstractIT {
     static {
         POSTGRES.start();
         REDIS.start();
+        wireMockServer.start();
     }
 
     @BeforeAll
     static void initWireMock() {
-        if (wireMockServer == null) {
-            wireMockServer = new WireMockServer(0);
-            wireMockServer.start();
-        }
-    }
-
-    @AfterAll
-    static void destroyWireMock() {
-        if (wireMockServer != null) {
-            wireMockServer.stop();
-        }
+        wireMockServer.resetAll();
     }
 
     @DynamicPropertySource
@@ -73,6 +66,6 @@ public abstract class AbstractIT {
 
         registry.add("jwt.secret", () -> TEST_SECRET_STRING);
 
-        registry.add("user-service.url", () -> wireMockServer.baseUrl());
+        registry.add("user-service.url", wireMockServer::baseUrl);
     }
 }

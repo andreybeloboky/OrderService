@@ -5,26 +5,26 @@
     <groupId>org.springframework.boot</groupId>
     <artifactId>spring-boot-starter-parent</artifactId>
     <version>4.1.0</version>
-    <relativePath/>
+    <relativePath></relativePath>
     <!-- lookup parent from repository -->
   </parent>
   <groupId>com.beloboki</groupId>
   <artifactId>order-service</artifactId>
   <version>0.0.1-SNAPSHOT</version>
-  <name/>
-  <description/>
-  <url/>
+  <name></name>
+  <description></description>
+  <url></url>
   <licenses>
-    <license/>
+    <license></license>
   </licenses>
   <developers>
-    <developer/>
+    <developer></developer>
   </developers>
   <scm>
-    <connection/>
-    <developerConnection/>
-    <tag/>
-    <url/>
+    <connection></connection>
+    <developerConnection></developerConnection>
+    <tag></tag>
+    <url></url>
   </scm>
   <properties>
     <maven.compiler.release>21</maven.compiler.release>
