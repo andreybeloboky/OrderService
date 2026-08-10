@@ -2,7 +2,7 @@ name: build-and-deploy
 
 on:
   push:
-    branches:  ["main", "abjack-14"]
+    branches:  ["main", "epic/abjack-11"]
 
 jobs:
   build-and-deploy:
