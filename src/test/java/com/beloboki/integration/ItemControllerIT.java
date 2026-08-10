@@ -101,20 +101,6 @@ public class ItemControllerIT extends AbstractIT {
     }
 
     @Test
-    void givenItemIdAndDifferentUserToken_ShouldReturnForbidden() {
-        String specificUserToken =
-                generateTestToken("user@test.com", testItem.getId() + 999, "USER");
-
-        webTestClient
-                .get()
-                .uri("/api/items/" + testItem.getId())
-                .header("Authorization", "Bearer " + specificUserToken)
-                .exchange()
-                .expectStatus()
-                .isForbidden();
-    }
-
-    @Test
     void givenPageRequestAndUserToken_ShouldReturnItems() {
         webTestClient
                 .get()

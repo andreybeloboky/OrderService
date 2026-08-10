@@ -17,7 +17,9 @@ import com.beloboki.specification.OrderSpecifications;
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Map;
 import java.util.Objects;
+import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.cache.annotation.CacheConfig;
@@ -98,14 +100,18 @@ public class OrderService {
             LocalDateTime endDate,
             List<Status> statuses,
             Pageable pageable) {
-        return orderDAO.findAll(
+        Page<Order> orders =
+                orderDAO.findAll(
                         OrderSpecifications.getOrdersByCriteria(startDate, endDate, statuses),
-                        pageable)
-                .map(
-                        order -> {
-                            UserResponse user = userClient.getUserById(order.getUserId());
-                            return orderMapper.toResponse(order, user);
-                        });
+                        pageable);
+
+        List<Long> userIds = orders.stream().map(Order::getUserId).distinct().toList();
+
+        Map<Long, UserResponse> users =
+                userClient.getUsersByIds(userIds).stream()
+                        .collect(Collectors.toMap(UserResponse::id, u -> u));
+
+        return orders.map(order -> orderMapper.toResponse(order, users.get(order.getUserId())));
     }
 
     public List<OrderResponse> getOrdersByUserId(Long userId, CurrentUser currentUser) {
@@ -140,7 +146,7 @@ public class OrderService {
 
         order.setUserId(user.id());
         order.setStatus(updatedData.getStatus());
-        orderItemDAO.deleteById(order.getId());
+
         order.getOrderItems().clear();
 
         BigDecimal total = BigDecimal.ZERO;
@@ -173,12 +179,14 @@ public class OrderService {
 
     @Transactional
     @CacheEvict(key = "#id")
-    public void deleteOrder(Long id) {
+    public void deleteOrder(Long id, CurrentUser currentUser) {
+        validate(currentUser.userId(), id, currentUser.role());
         Order order =
                 orderDAO.findById(id)
                         .orElseThrow(
                                 () -> new OrderNotFoundException("Order not found with id " + id));
-        orderDAO.delete(order);
+        order.setDeleted(true);
+        orderDAO.save(order);
     }
 
     private void validate(Long currentUserId, Long targetUserId, String role) {

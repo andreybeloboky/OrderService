@@ -4,7 +4,6 @@ import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import java.io.Serializable;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
-import java.util.List;
 
 @JsonIgnoreProperties(ignoreUnknown = true)
 public record UserResponse(
@@ -15,6 +14,5 @@ public record UserResponse(
         String email,
         Boolean active,
         LocalDateTime createdAt,
-        LocalDateTime updatedAt,
-        List<PaymentCardResponse> paymentCards)
+        LocalDateTime updatedAt)
         implements Serializable {}

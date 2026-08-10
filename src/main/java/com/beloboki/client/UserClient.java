@@ -1,8 +1,9 @@
 package com.beloboki.client;
 
 import com.beloboki.dto.UserResponse;
-import com.beloboki.exception.UserNotFoundException;
 import io.github.resilience4j.circuitbreaker.annotation.CircuitBreaker;
+import java.time.LocalDateTime;
+import java.util.List;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
@@ -15,7 +16,7 @@ public class UserClient {
 
     private final WebClient userWebClient;
 
-    @CircuitBreaker(name = "userService", fallbackMethod = "fallback")
+    @CircuitBreaker(name = "userService", fallbackMethod = "getUserByEmailFallback")
     public UserResponse getUserByEmail(String email) {
         return userWebClient
                 .get()
@@ -25,7 +26,7 @@ public class UserClient {
                 .block();
     }
 
-    @CircuitBreaker(name = "userService", fallbackMethod = "fallback")
+    @CircuitBreaker(name = "userService", fallbackMethod = "getUserByIdFallback")
     public UserResponse getUserById(Long id) {
         return userWebClient
                 .get()
@@ -35,8 +36,58 @@ public class UserClient {
                 .block();
     }
 
-    public UserResponse fallback(Exception e) {
-        log.error("Circuit breaker fallback triggered: {}", e.getMessage());
-        throw new UserNotFoundException("User not found or service unavailable");
+    @CircuitBreaker(name = "userService", fallbackMethod = "getUsersByIdsFallback")
+    public List<UserResponse> getUsersByIds(List<Long> ids) {
+        return userWebClient
+                .post()
+                .uri("/api/users/batch")
+                .bodyValue(ids)
+                .retrieve()
+                .bodyToFlux(UserResponse.class)
+                .collectList()
+                .block();
+    }
+
+    public UserResponse getUserByEmailFallback(String email, Throwable t) {
+        log.error("Fallback for getUserByEmail: {}", t.getMessage());
+        return new UserResponse(
+                null,
+                "UNKNOWN",
+                "UNKNOWN",
+                null,
+                email,
+                false,
+                LocalDateTime.now(),
+                LocalDateTime.now());
+    }
+
+    public UserResponse getUserByIdFallback(Long id, Throwable t) {
+        log.error("Fallback for getUserById: {}", t.getMessage());
+        return new UserResponse(
+                id,
+                "UNKNOWN",
+                "UNKNOWN",
+                null,
+                "UNKNOWN",
+                false,
+                LocalDateTime.now(),
+                LocalDateTime.now());
+    }
+
+    public List<UserResponse> getUsersByIdsFallback(List<Long> ids, Throwable t) {
+        log.error("Fallback for getUsersByIds: {}", t.getMessage());
+        return ids.stream()
+                .map(
+                        id ->
+                                new UserResponse(
+                                        id,
+                                        "UNKNOWN",
+                                        "UNKNOWN",
+                                        null,
+                                        "UNKNOWN",
+                                        false,
+                                        LocalDateTime.now(),
+                                        LocalDateTime.now()))
+                .toList();
     }
 }

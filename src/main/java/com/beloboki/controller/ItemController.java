@@ -1,6 +1,5 @@
 package com.beloboki.controller;
 
-import com.beloboki.config.CurrentUser;
 import com.beloboki.dto.ItemRequest;
 import com.beloboki.dto.ItemResponse;
 import com.beloboki.service.ItemService;
@@ -11,7 +10,6 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
-import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
@@ -29,9 +27,8 @@ public class ItemController {
 
     @GetMapping("/{id}")
     @PreAuthorize("hasAnyRole('USER', 'ADMIN')")
-    public ResponseEntity<ItemResponse> getItemById(
-            @AuthenticationPrincipal CurrentUser currentUser, @PathVariable Long id) {
-        return ResponseEntity.ok(itemService.getItemById(id, currentUser));
+    public ResponseEntity<ItemResponse> getItemById(@PathVariable Long id) {
+        return ResponseEntity.ok(itemService.getItemById(id));
     }
 
     @GetMapping

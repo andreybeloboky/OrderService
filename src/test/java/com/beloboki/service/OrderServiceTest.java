@@ -13,6 +13,7 @@ import com.beloboki.dto.OrderItemRequest;
 import com.beloboki.dto.OrderRequest;
 import com.beloboki.dto.OrderResponse;
 import com.beloboki.dto.UserResponse;
+import com.beloboki.exception.OrderNotFoundException;
 import com.beloboki.exception.UserNotFoundException;
 import com.beloboki.mapper.OrderMapper;
 import com.beloboki.model.Item;
@@ -31,6 +32,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.jpa.domain.Specification;
+import org.springframework.security.authorization.AuthorizationDeniedException;
 
 @ExtendWith(MockitoExtension.class)
 public class OrderServiceTest {
@@ -53,8 +55,7 @@ public class OrderServiceTest {
                 new OrderRequest(
                         "test@test.com", Status.CREATED, List.of(new OrderItemRequest(1L, 2)));
         UserResponse user =
-                new UserResponse(
-                        1L, "Name", "Surname", null, "test@test.com", true, null, null, null);
+                new UserResponse(1L, "Name", "Surname", null, "test@test.com", true, null, null);
         Item item = new Item(1L, "Item1", BigDecimal.TEN);
 
         Order order = new Order();
@@ -121,8 +122,7 @@ public class OrderServiceTest {
         order.setUserId(1L);
 
         UserResponse user =
-                new UserResponse(
-                        1L, "Name", "Surname", null, "test@test.com", true, null, null, null);
+                new UserResponse(1L, "Name", "Surname", null, "test@test.com", true, null, null);
         OrderResponse mappedResponse =
                 new OrderResponse(
                         10L,
@@ -152,8 +152,7 @@ public class OrderServiceTest {
 
         Page<Order> page = new PageImpl<>(List.of(order));
         UserResponse user =
-                new UserResponse(
-                        1L, "Name", "Surname", null, "test@test.com", true, null, null, null);
+                new UserResponse(1L, "Name", "Surname", null, "test@test.com", true, null, null);
         OrderResponse mappedResponse =
                 new OrderResponse(
                         10L,
@@ -165,7 +164,7 @@ public class OrderServiceTest {
                         List.of());
 
         when(orderDAO.findAll(any(Specification.class), any(PageRequest.class))).thenReturn(page);
-        when(userClient.getUserById(1L)).thenReturn(user);
+        when(userClient.getUsersByIds(anyList())).thenReturn(List.of(user));
         when(orderMapper.toResponse(any(Order.class), any(UserResponse.class)))
                 .thenReturn(mappedResponse);
 
@@ -183,8 +182,7 @@ public class OrderServiceTest {
         order.setUserId(1L);
 
         UserResponse user =
-                new UserResponse(
-                        1L, "Name", "Surname", null, "test@test.com", true, null, null, null);
+                new UserResponse(1L, "Name", "Surname", null, "test@test.com", true, null, null);
         OrderResponse mappedResponse =
                 new OrderResponse(
                         10L,
@@ -217,8 +215,7 @@ public class OrderServiceTest {
         order.setUserId(1L);
 
         UserResponse user =
-                new UserResponse(
-                        2L, "Name", "Surname", null, "test@test.com", true, null, null, null);
+                new UserResponse(2L, "Name", "Surname", null, "test@test.com", true, null, null);
         Item item = new Item(1L, "Item1", BigDecimal.TEN);
 
         Order mappedOrder = new Order();
@@ -261,8 +258,68 @@ public class OrderServiceTest {
         order.setId(10L);
         when(orderDAO.findById(10L)).thenReturn(Optional.of(order));
 
-        orderService.deleteOrder(10L);
+        orderService.deleteOrder(10L, new CurrentUser(10L, null, null));
 
-        verify(orderDAO, times(1)).delete(order);
+        assertTrue(order.getDeleted());
+        verify(orderDAO, times(1)).save(order);
+    }
+
+    @Test
+    void givenOrderId_ShouldThrowException_WhenOrderNotFound() {
+        when(orderDAO.findById(10L)).thenReturn(Optional.empty());
+
+        assertThrows(
+                OrderNotFoundException.class,
+                () -> orderService.getOrderById(10L, new CurrentUser(1L, "user", "USER")));
+    }
+
+    @Test
+    void givenOrderId_ShouldThrowException_WhenAccessDenied() {
+        Order order = new Order();
+        order.setId(10L);
+        order.setUserId(2L);
+
+        when(orderDAO.findById(10L)).thenReturn(Optional.of(order));
+
+        assertThrows(
+                AuthorizationDeniedException.class,
+                () -> orderService.getOrderById(10L, new CurrentUser(1L, "user", "USER")));
+    }
+
+    @Test
+    void givenOrderId_ShouldThrowException_WhenOrderNotFoundOnUpdate() {
+        OrderRequest request = new OrderRequest("test@test.com", Status.PAID, List.of());
+
+        when(orderDAO.findById(10L)).thenReturn(Optional.empty());
+
+        assertThrows(
+                OrderNotFoundException.class,
+                () -> orderService.updateOrder(10L, request, new CurrentUser(1L, "user", "USER")));
+    }
+
+    @Test
+    void givenOrderId_ShouldThrowException_WhenAccessDeniedOnDelete() {
+        assertThrows(
+                AuthorizationDeniedException.class,
+                () -> orderService.deleteOrder(10L, new CurrentUser(1L, "user", "USER")));
+    }
+
+    @Test
+    void givenOrderId_ShouldThrowException_WhenUserNotFoundOnUpdate() {
+        Order order = new Order();
+        order.setId(10L);
+        order.setUserId(1L);
+
+        OrderRequest request = new OrderRequest("test@test.com", Status.PAID, List.of());
+        Order mappedOrder = new Order();
+        mappedOrder.setUserEmail("test@test.com");
+
+        when(orderDAO.findById(10L)).thenReturn(Optional.of(order));
+        when(orderMapper.toEntity(request)).thenReturn(mappedOrder);
+        when(userClient.getUserByEmail("test@test.com")).thenReturn(null);
+
+        assertThrows(
+                UserNotFoundException.class,
+                () -> orderService.updateOrder(10L, request, new CurrentUser(1L, "user", "USER")));
     }
 }

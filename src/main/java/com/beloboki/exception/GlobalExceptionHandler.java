@@ -39,7 +39,8 @@ public class GlobalExceptionHandler {
     @ExceptionHandler({
         EntityNotFoundException.class,
         OrderNotFoundException.class,
-        ItemNotFoundException.class
+        ItemNotFoundException.class,
+        UserNotFoundException.class
     })
     public ResponseEntity<ProblemDetail> handleEntityNotFoundException(Exception e) {
         log.error("Handle entity not found exception", e);
@@ -53,8 +54,7 @@ public class GlobalExceptionHandler {
     @ExceptionHandler({
         IllegalArgumentException.class,
         IllegalStateException.class,
-        MethodArgumentNotValidException.class,
-        UserNotFoundException.class
+        MethodArgumentNotValidException.class
     })
     public ResponseEntity<ProblemDetail> handleBadRequest(Exception e) {
         log.error("Handle IllegalArgumentException", e);

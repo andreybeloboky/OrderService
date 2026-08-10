@@ -1,14 +1,11 @@
 package com.beloboki.service;
 
-import com.beloboki.config.CurrentUser;
 import com.beloboki.dao.ItemDAO;
 import com.beloboki.dto.ItemRequest;
 import com.beloboki.dto.ItemResponse;
 import com.beloboki.exception.ItemNotFoundException;
 import com.beloboki.mapper.ItemMapper;
 import com.beloboki.model.Item;
-import com.beloboki.model.Role;
-import java.util.Objects;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.cache.annotation.CacheConfig;
@@ -16,7 +13,6 @@ import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
-import org.springframework.security.authorization.AuthorizationDeniedException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -29,13 +25,6 @@ public class ItemService {
     private final ItemDAO itemDAO;
     private final ItemMapper itemMapper;
 
-    public void validate(Long id, Long currentUserId, String role) {
-        if (!Objects.equals(id, currentUserId)
-                && !Objects.equals(role, String.valueOf(Role.ADMIN))) {
-            throw new AuthorizationDeniedException("Access denied");
-        }
-    }
-
     @Transactional
     public ItemResponse createItem(ItemRequest request) {
         Item item = itemMapper.toEntity(request);
@@ -44,8 +33,7 @@ public class ItemService {
     }
 
     @Cacheable(key = "#id")
-    public ItemResponse getItemById(Long id, CurrentUser currentUser) {
-        validate(id, currentUser.userId(), currentUser.role());
+    public ItemResponse getItemById(Long id) {
         Item item =
                 itemDAO.findById(id)
                         .orElseThrow(

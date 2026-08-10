@@ -111,6 +111,39 @@ public class OrderControllerIT extends AbstractIT {
                                         .withStatus(200)));
     }
 
+    private void stubUsersBatch(List<Long> expectedIds, String email) {
+        String expectedRequestBody = expectedIds.toString();
+
+        StringBuilder responseBody = new StringBuilder("[");
+        for (int i = 0; i < expectedIds.size(); i++) {
+            responseBody.append(
+                    """
+                    {
+                      "id": %d,
+                      "name": "Test",
+                      "surname": "User",
+                      "email": "%s",
+                      "active": true
+                    }
+                    """
+                            .formatted(expectedIds.get(i), email));
+            if (i < expectedIds.size() - 1) {
+                responseBody.append(",");
+            }
+        }
+        responseBody.append("]");
+
+        wireMockServer.stubFor(
+                post(urlPathEqualTo("/api/users/batch"))
+                        .withRequestBody(
+                                equalToJson(expectedRequestBody)) // Проверяем, что ушли нужные ID
+                        .willReturn(
+                                aResponse()
+                                        .withHeader("Content-Type", "application/json")
+                                        .withBody(responseBody.toString())
+                                        .withStatus(200)));
+    }
+
     @Test
     void givenOrderRequestAndExistingUser_ShouldCreateOrder() {
         String userEmail = "test@test.com";
@@ -162,7 +195,7 @@ public class OrderControllerIT extends AbstractIT {
                 .bodyValue(request)
                 .exchange()
                 .expectStatus()
-                .isBadRequest()
+                .isNotFound()
                 .expectBody(ProblemDetail.class)
                 .value(p -> assertEquals("User not found or service unavailable", p.getDetail()));
     }
@@ -218,7 +251,7 @@ public class OrderControllerIT extends AbstractIT {
 
     @Test
     void givenOrdersRequestAndExistingUser_ShouldReturnOrders() {
-        stubUserById(1L, "test@test.com");
+        stubUsersBatch(List.of(1L), "test@test.com");
 
         webTestClient
                 .get()

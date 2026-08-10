@@ -5,10 +5,10 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.*;
 
-import com.beloboki.config.CurrentUser;
 import com.beloboki.dao.ItemDAO;
 import com.beloboki.dto.ItemRequest;
 import com.beloboki.dto.ItemResponse;
+import com.beloboki.exception.ItemNotFoundException;
 import com.beloboki.mapper.ItemMapper;
 import com.beloboki.model.Item;
 import java.math.BigDecimal;
@@ -22,7 +22,6 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
-import org.springframework.security.authorization.AuthorizationDeniedException;
 
 @ExtendWith(MockitoExtension.class)
 public class ItemServiceTest {
@@ -55,15 +54,13 @@ public class ItemServiceTest {
         when(itemDAO.findById(1L)).thenReturn(Optional.of(item));
         when(itemMapper.toResponse(any(Item.class))).thenReturn(response);
 
-        ItemResponse result = itemService.getItemById(1L, new CurrentUser(1L, "user", "USER"));
+        ItemResponse result = itemService.getItemById(1L);
         assertEquals(1L, result.id());
     }
 
     @Test
     void givenItemIdAndDifferentUser_ShouldThrowException_WhenAccessDenied() {
-        assertThrows(
-                AuthorizationDeniedException.class,
-                () -> itemService.getItemById(1L, new CurrentUser(2L, "user", "USER")));
+        assertThrows(ItemNotFoundException.class, () -> itemService.getItemById(1L));
     }
 
     @Test
@@ -104,5 +101,21 @@ public class ItemServiceTest {
         itemService.deleteItem(1L);
 
         verify(itemDAO, times(1)).delete(item);
+    }
+
+    @Test
+    void givenItemId_ShouldThrowException_WhenItemNotFoundOnUpdate() {
+        ItemRequest request = new ItemRequest("UpdatedName", BigDecimal.valueOf(100));
+
+        when(itemDAO.findById(10L)).thenReturn(Optional.empty());
+
+        assertThrows(ItemNotFoundException.class, () -> itemService.updateItem(10L, request));
+    }
+
+    @Test
+    void givenItemId_ShouldThrowException_WhenItemNotFoundOnDelete() {
+        when(itemDAO.findById(10L)).thenReturn(Optional.empty());
+
+        assertThrows(ItemNotFoundException.class, () -> itemService.deleteItem(10L));
     }
 }
