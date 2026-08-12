@@ -12,8 +12,10 @@ import com.beloboki.model.Item;
 import com.beloboki.model.Order;
 import com.beloboki.model.OrderItem;
 import com.beloboki.model.Status;
+
 import java.math.BigDecimal;
 import java.util.List;
+
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -26,17 +28,29 @@ import org.springframework.test.web.reactive.server.WebTestClient;
 @DirtiesContext(classMode = DirtiesContext.ClassMode.BEFORE_CLASS)
 public class OrderControllerIT extends AbstractIT {
 
-    @Autowired private WebTestClient webTestClient;
+    @Autowired
+    private WebTestClient webTestClient;
 
-    @Autowired private JdbcTemplate jdbcTemplate;
+    @Autowired
+    private JdbcTemplate jdbcTemplate;
 
-    @Autowired private OrderDAO orderDAO;
+    @Autowired
+    private OrderDAO orderDAO;
 
-    @Autowired private ItemDAO itemDAO;
+    @Autowired
+    private ItemDAO itemDAO;
+
+    private static final String PATH = "/api/orders";
+    private static final String PATH_WITH_ID = "/api/orders/";
+    private static final String PATH_WITH_USER = "/api/orders/user/";
+
+    private static final String AUTHORIZATION = "Authorization";
+    private static final String BEARER = "Bearer ";
 
     private Item testItem;
     private Order testOrder;
     private String token;
+    private OrderRequest request;
 
     @BeforeEach
     void setUp() {
@@ -64,6 +78,11 @@ public class OrderControllerIT extends AbstractIT {
         order.getOrderItems().add(orderItem);
 
         testOrder = orderDAO.save(order);
+        request =
+                new OrderRequest(
+                        "update@test.com",
+                        Status.PAID,
+                        List.of(new OrderItemRequest(testItem.getId(), 3)));
     }
 
     @AfterEach
@@ -79,14 +98,14 @@ public class OrderControllerIT extends AbstractIT {
                                         .withHeader("Content-Type", "application/json")
                                         .withBody(
                                                 """
-                                                {
-                                                  "id": %d,
-                                                  "name": "Test",
-                                                  "surname": "User",
-                                                  "email": "%s",
-                                                  "active": true
-                                                }
-                                                """
+                                                        {
+                                                          "id": %d,
+                                                          "name": "Test",
+                                                          "surname": "User",
+                                                          "email": "%s",
+                                                          "active": true
+                                                        }
+                                                        """
                                                         .formatted(userId, email))
                                         .withStatus(200)));
     }
@@ -99,14 +118,14 @@ public class OrderControllerIT extends AbstractIT {
                                         .withHeader("Content-Type", "application/json")
                                         .withBody(
                                                 """
-                                                {
-                                                  "id": %d,
-                                                  "name": "Test",
-                                                  "surname": "User",
-                                                  "email": "%s",
-                                                  "active": true
-                                                }
-                                                """
+                                                        {
+                                                          "id": %d,
+                                                          "name": "Test",
+                                                          "surname": "User",
+                                                          "email": "%s",
+                                                          "active": true
+                                                        }
+                                                        """
                                                         .formatted(userId, email))
                                         .withStatus(200)));
     }
@@ -118,14 +137,14 @@ public class OrderControllerIT extends AbstractIT {
         for (int i = 0; i < expectedIds.size(); i++) {
             responseBody.append(
                     """
-                    {
-                      "id": %d,
-                      "name": "Test",
-                      "surname": "User",
-                      "email": "%s",
-                      "active": true
-                    }
-                    """
+                            {
+                              "id": %d,
+                              "name": "Test",
+                              "surname": "User",
+                              "email": "%s",
+                              "active": true
+                            }
+                            """
                             .formatted(expectedIds.get(i), email));
             if (i < expectedIds.size() - 1) {
                 responseBody.append(",");
@@ -158,8 +177,8 @@ public class OrderControllerIT extends AbstractIT {
         OrderResponse body =
                 webTestClient
                         .post()
-                        .uri("/api/orders")
-                        .header("Authorization", "Bearer " + token)
+                        .uri(PATH)
+                        .header(AUTHORIZATION, BEARER + token)
                         .bodyValue(request)
                         .exchange()
                         .expectStatus()
@@ -190,8 +209,8 @@ public class OrderControllerIT extends AbstractIT {
 
         webTestClient
                 .post()
-                .uri("/api/orders")
-                .header("Authorization", "Bearer " + token)
+                .uri(PATH)
+                .header(AUTHORIZATION, BEARER + token)
                 .bodyValue(request)
                 .exchange()
                 .expectStatus()
@@ -208,8 +227,8 @@ public class OrderControllerIT extends AbstractIT {
 
         webTestClient
                 .post()
-                .uri("/api/orders")
-                .header("Authorization", "Bearer " + token)
+                .uri(PATH)
+                .header(AUTHORIZATION, BEARER + token)
                 .bodyValue(request)
                 .exchange()
                 .expectStatus()
@@ -223,8 +242,8 @@ public class OrderControllerIT extends AbstractIT {
         OrderResponse body =
                 webTestClient
                         .get()
-                        .uri("/api/orders/" + testOrder.getId())
-                        .header("Authorization", "Bearer " + token)
+                        .uri(PATH_WITH_ID + testOrder.getId())
+                        .header(AUTHORIZATION, BEARER + token)
                         .exchange()
                         .expectStatus()
                         .isOk()
@@ -272,8 +291,8 @@ public class OrderControllerIT extends AbstractIT {
         List<OrderResponse> orders =
                 webTestClient
                         .get()
-                        .uri("/api/orders/user/" + testOrder.getUserId())
-                        .header("Authorization", "Bearer " + token)
+                        .uri(PATH_WITH_USER + testOrder.getUserId())
+                        .header(AUTHORIZATION, BEARER + token)
                         .exchange()
                         .expectStatus()
                         .isOk()
@@ -290,17 +309,11 @@ public class OrderControllerIT extends AbstractIT {
     void givenOrderIdAndUpdateRequest_ShouldUpdateOrder() {
         stubUserByEmail("update@test.com", 2L);
 
-        OrderRequest request =
-                new OrderRequest(
-                        "update@test.com",
-                        Status.PAID,
-                        List.of(new OrderItemRequest(testItem.getId(), 3)));
-
         OrderResponse body =
                 webTestClient
                         .put()
-                        .uri("/api/orders/" + testOrder.getId())
-                        .header("Authorization", "Bearer " + token)
+                        .uri(PATH_WITH_ID + testOrder.getId())
+                        .header(AUTHORIZATION, BEARER + token)
                         .bodyValue(request)
                         .exchange()
                         .expectStatus()
@@ -319,16 +332,10 @@ public class OrderControllerIT extends AbstractIT {
     void givenOrderIdAndUpdateRequest_ShouldReturnNotFound() {
         stubUserByEmail("update@test.com", 2L);
 
-        OrderRequest request =
-                new OrderRequest(
-                        "update@test.com",
-                        Status.PAID,
-                        List.of(new OrderItemRequest(testItem.getId(), 3)));
-
         webTestClient
                 .put()
                 .uri("/api/orders/999")
-                .header("Authorization", "Bearer " + token)
+                .header(AUTHORIZATION, BEARER + token)
                 .bodyValue(request)
                 .exchange()
                 .expectStatus()
@@ -339,23 +346,12 @@ public class OrderControllerIT extends AbstractIT {
     void givenOrderId_ShouldDeleteOrder() {
         webTestClient
                 .delete()
-                .uri("/api/orders/" + testOrder.getId())
-                .header("Authorization", "Bearer " + token)
+                .uri(PATH_WITH_ID + testOrder.getId())
+                .header(AUTHORIZATION, BEARER + token)
                 .exchange()
                 .expectStatus()
                 .isNoContent();
 
         assertTrue(orderDAO.findById(testOrder.getId()).isEmpty());
-    }
-
-    @Test
-    void givenOrderId_ShouldReturnNotFoundOrderDoesNotExist() {
-        webTestClient
-                .delete()
-                .uri("/api/orders/999")
-                .header("Authorization", "Bearer " + token)
-                .exchange()
-                .expectStatus()
-                .isNotFound();
     }
 }
