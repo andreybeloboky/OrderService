@@ -54,7 +54,8 @@ public class OrderServiceTest {
     @Test
     void givenOrderRequest_ShouldCreateOrder_WhenUserExists() {
         OrderRequest request =
-                new OrderRequest("test@test.com", Status.CREATED, List.of(new OrderItemRequest(1L, 2)));
+                new OrderRequest(
+                        "test@test.com", Status.CREATED, List.of(new OrderItemRequest(1L, 2)));
 
         UserResponse user =
                 new UserResponse(1L, "Name", "Surname", null, "test@test.com", true, null, null);
