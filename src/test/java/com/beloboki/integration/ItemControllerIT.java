@@ -7,9 +7,7 @@ import com.beloboki.dao.ItemDAO;
 import com.beloboki.dto.ItemRequest;
 import com.beloboki.dto.ItemResponse;
 import com.beloboki.model.Item;
-
 import java.math.BigDecimal;
-
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -20,14 +18,11 @@ import org.springframework.test.web.reactive.server.WebTestClient;
 @DirtiesContext(classMode = DirtiesContext.ClassMode.BEFORE_CLASS)
 public class ItemControllerIT extends AbstractIT {
 
-    @Autowired
-    private WebTestClient webTestClient;
+    @Autowired private WebTestClient webTestClient;
 
-    @Autowired
-    private JdbcTemplate jdbcTemplate;
+    @Autowired private JdbcTemplate jdbcTemplate;
 
-    @Autowired
-    private ItemDAO itemDAO;
+    @Autowired private ItemDAO itemDAO;
 
     private Item testItem;
     private String adminToken;

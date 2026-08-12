@@ -12,10 +12,8 @@ import com.beloboki.model.Item;
 import com.beloboki.model.Order;
 import com.beloboki.model.OrderItem;
 import com.beloboki.model.Status;
-
 import java.math.BigDecimal;
 import java.util.List;
-
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -28,17 +26,13 @@ import org.springframework.test.web.reactive.server.WebTestClient;
 @DirtiesContext(classMode = DirtiesContext.ClassMode.BEFORE_CLASS)
 public class OrderControllerIT extends AbstractIT {
 
-    @Autowired
-    private WebTestClient webTestClient;
+    @Autowired private WebTestClient webTestClient;
 
-    @Autowired
-    private JdbcTemplate jdbcTemplate;
+    @Autowired private JdbcTemplate jdbcTemplate;
 
-    @Autowired
-    private OrderDAO orderDAO;
+    @Autowired private OrderDAO orderDAO;
 
-    @Autowired
-    private ItemDAO itemDAO;
+    @Autowired private ItemDAO itemDAO;
 
     private static final String PATH = "/api/orders";
     private static final String PATH_WITH_ID = "/api/orders/";
@@ -98,14 +92,14 @@ public class OrderControllerIT extends AbstractIT {
                                         .withHeader("Content-Type", "application/json")
                                         .withBody(
                                                 """
-                                                        {
-                                                          "id": %d,
-                                                          "name": "Test",
-                                                          "surname": "User",
-                                                          "email": "%s",
-                                                          "active": true
-                                                        }
-                                                        """
+                                                {
+                                                  "id": %d,
+                                                  "name": "Test",
+                                                  "surname": "User",
+                                                  "email": "%s",
+                                                  "active": true
+                                                }
+                                                """
                                                         .formatted(userId, email))
                                         .withStatus(200)));
     }
@@ -118,14 +112,14 @@ public class OrderControllerIT extends AbstractIT {
                                         .withHeader("Content-Type", "application/json")
                                         .withBody(
                                                 """
-                                                        {
-                                                          "id": %d,
-                                                          "name": "Test",
-                                                          "surname": "User",
-                                                          "email": "%s",
-                                                          "active": true
-                                                        }
-                                                        """
+                                                {
+                                                  "id": %d,
+                                                  "name": "Test",
+                                                  "surname": "User",
+                                                  "email": "%s",
+                                                  "active": true
+                                                }
+                                                """
                                                         .formatted(userId, email))
                                         .withStatus(200)));
     }
@@ -137,14 +131,14 @@ public class OrderControllerIT extends AbstractIT {
         for (int i = 0; i < expectedIds.size(); i++) {
             responseBody.append(
                     """
-                            {
-                              "id": %d,
-                              "name": "Test",
-                              "surname": "User",
-                              "email": "%s",
-                              "active": true
-                            }
-                            """
+                    {
+                      "id": %d,
+                      "name": "Test",
+                      "surname": "User",
+                      "email": "%s",
+                      "active": true
+                    }
+                    """
                             .formatted(expectedIds.get(i), email));
             if (i < expectedIds.size() - 1) {
                 responseBody.append(",");
@@ -154,8 +148,7 @@ public class OrderControllerIT extends AbstractIT {
 
         wireMockServer.stubFor(
                 post(urlPathEqualTo("/api/users/batch"))
-                        .withRequestBody(
-                                equalToJson(expectedRequestBody))
+                        .withRequestBody(equalToJson(expectedRequestBody))
                         .willReturn(
                                 aResponse()
                                         .withHeader("Content-Type", "application/json")
