@@ -40,8 +40,8 @@ public class ItemServiceTest {
         ItemResponse response = new ItemResponse(1L, "Test", BigDecimal.TEN);
 
         when(itemMapper.toEntity(request)).thenReturn(item);
-        when(itemDAO.save(any(Item.class))).thenReturn(savedItem);
-        when(itemMapper.toResponse(any(Item.class))).thenReturn(response);
+        when(itemDAO.saveAndFlush(any(Item.class))).thenReturn(savedItem);
+        doReturn(response).when(itemMapper).toResponse(any());
 
         ItemResponse result = itemService.createItem(request);
         assertEquals(1L, result.id());
@@ -86,7 +86,7 @@ public class ItemServiceTest {
 
         when(itemDAO.findById(1L)).thenReturn(Optional.of(item));
         when(itemMapper.toEntity(request)).thenReturn(mappedItem);
-        when(itemDAO.save(any(Item.class))).thenReturn(savedItem);
+        when(itemDAO.saveAndFlush(any(Item.class))).thenReturn(savedItem);
         when(itemMapper.toResponse(any(Item.class))).thenReturn(response);
 
         ItemResponse result = itemService.updateItem(1L, request);
