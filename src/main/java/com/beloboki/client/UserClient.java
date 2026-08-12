@@ -15,6 +15,7 @@ import org.springframework.web.reactive.function.client.WebClient;
 public class UserClient {
 
     private final WebClient userWebClient;
+    private static final String UNKNOWN = "UNKNOWN";
 
     @CircuitBreaker(name = "userService", fallbackMethod = "getUserByEmailFallback")
     public UserResponse getUserByEmail(String email) {
@@ -52,8 +53,8 @@ public class UserClient {
         log.error("Fallback for getUserByEmail: {}", t.getMessage());
         return new UserResponse(
                 null,
-                "UNKNOWN",
-                "UNKNOWN",
+                UNKNOWN,
+                UNKNOWN,
                 null,
                 email,
                 false,
@@ -65,10 +66,10 @@ public class UserClient {
         log.error("Fallback for getUserById: {}", t.getMessage());
         return new UserResponse(
                 id,
-                "UNKNOWN",
-                "UNKNOWN",
+                UNKNOWN,
+                UNKNOWN,
                 null,
-                "UNKNOWN",
+                UNKNOWN,
                 false,
                 LocalDateTime.now(),
                 LocalDateTime.now());
@@ -81,10 +82,10 @@ public class UserClient {
                         id ->
                                 new UserResponse(
                                         id,
-                                        "UNKNOWN",
-                                        "UNKNOWN",
+                                        UNKNOWN,
+                                        UNKNOWN,
                                         null,
-                                        "UNKNOWN",
+                                        UNKNOWN,
                                         false,
                                         LocalDateTime.now(),
                                         LocalDateTime.now()))

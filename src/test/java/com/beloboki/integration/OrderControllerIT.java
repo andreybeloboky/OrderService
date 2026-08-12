@@ -136,7 +136,7 @@ public class OrderControllerIT extends AbstractIT {
         wireMockServer.stubFor(
                 post(urlPathEqualTo("/api/users/batch"))
                         .withRequestBody(
-                                equalToJson(expectedRequestBody)) // Проверяем, что ушли нужные ID
+                                equalToJson(expectedRequestBody))
                         .willReturn(
                                 aResponse()
                                         .withHeader("Content-Type", "application/json")

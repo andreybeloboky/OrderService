@@ -37,8 +37,6 @@ public class SecurityConfig {
                 .authorizeHttpRequests(
                         auth ->
                                 auth
-                                        // .requestMatchers("/api/orders", "/api/orders/**")
-                                        // .permitAll()
                                         .anyRequest()
                                         .authenticated())
                 .oauth2ResourceServer(

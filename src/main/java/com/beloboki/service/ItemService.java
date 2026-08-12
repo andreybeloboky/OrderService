@@ -28,7 +28,7 @@ public class ItemService {
     @Transactional
     public ItemResponse createItem(ItemRequest request) {
         Item item = itemMapper.toEntity(request);
-        item = itemDAO.save(item);
+        item = itemDAO.saveAndFlush(item);
         return itemMapper.toResponse(item);
     }
 
@@ -58,7 +58,7 @@ public class ItemService {
         item.setName(updatedData.getName());
         item.setPrice(updatedData.getPrice());
 
-        item = itemDAO.save(item);
+        item = itemDAO.saveAndFlush(item);
         return itemMapper.toResponse(item);
     }
 

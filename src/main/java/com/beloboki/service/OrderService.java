@@ -76,8 +76,8 @@ public class OrderService {
         }
 
         order.setTotalPrice(total);
-        order = orderDAO.save(order);
-        orderItemDAO.saveAll(order.getOrderItems());
+        order = orderDAO.saveAndFlush(order);
+        orderItemDAO.saveAllAndFlush(order.getOrderItems());
 
         return orderMapper.toResponse(order, user);
     }
@@ -171,8 +171,8 @@ public class OrderService {
         }
 
         order.setTotalPrice(total);
-        order = orderDAO.save(order);
-        orderItemDAO.saveAll(order.getOrderItems());
+        order = orderDAO.saveAndFlush(order);
+        orderItemDAO.saveAllAndFlush(order.getOrderItems());
 
         return orderMapper.toResponse(order, user);
     }
@@ -186,7 +186,7 @@ public class OrderService {
                         .orElseThrow(
                                 () -> new OrderNotFoundException("Order not found with id " + id));
         order.setDeleted(true);
-        orderDAO.save(order);
+        orderDAO.saveAndFlush(order);
     }
 
     private void validate(Long currentUserId, Long targetUserId, String role) {
