@@ -67,7 +67,6 @@ services:
         - REDIS_PORT=${REDIS_PORT}
         - JWT_SECRET=${JWT_SECRET}
         - USER_SERVICE_URL=${USER_SERVICE_URL:-http://user-service:8080}
-
 volumes:
   mydb_data:
   redis_data:
